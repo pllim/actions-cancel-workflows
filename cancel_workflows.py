@@ -3,8 +3,12 @@ import sys
 
 from github import Github
 
-gh_ref = os.environ['GITHUB_REF']
-branch_name = gh_ref.replace('refs/heads/', '')
+event_name = os.environ['GITHUB_EVENT_NAME']
+if event_name in ('pull_request_target', 'pull_request'):
+    branch_name = os.environ['GITHUB_HEAD_REF']
+else:
+    gh_ref = os.environ['GITHUB_REF']
+    branch_name = gh_ref.replace('refs/heads/', '')
 repo_name = os.environ['GITHUB_REPOSITORY']
 g = Github(os.environ.get('GITHUB_TOKEN'))
 repo = g.get_repo(repo_name)
@@ -27,7 +31,7 @@ for wf in workflows_running:
         latest_timestamp = wf.created_at
 
 if latest_timestamp is None:
-    print(f'No duplicate workflows for {gh_ref} in {repo_name}')
+    print(f'No duplicate workflows for {branch_name} in {repo_name}')
     sys.exit(0)
 
 for wf in workflows_running:
@@ -40,4 +44,5 @@ for wf in workflows_queued:
         print(f'Cancelling queued {wf}')
         wf.cancel()
 
-print(f'Done checking for duplicate workflows for {gh_ref} in {repo_name}')
+print(f'Done checking for duplicate workflows for {branch_name} in '
+      '{repo_name}')
