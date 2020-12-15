@@ -10,13 +10,12 @@ RUN apt-get update \
     && python3 -m pip install --upgrade pip \
     && python3 -m pip install --upgrade setuptools \
     && python3 -m pip install --upgrade wheel \
-    && python3 -m pip install requests \
     && python3 -m pip install PyGithub
 
 # Copies code file action repository to the filesystem path `/` of the container
 COPY entrypoint.sh /entrypoint.sh
 
-COPY check_cfitsio_release.py /check_cfitsio_release.py
+COPY cancel_workflows.py /cancel_workflows.py
 
 # Code file to execute when the docker container starts up (`entrypoint.sh`)
 ENTRYPOINT ["/entrypoint.sh"]

@@ -1,30 +1,23 @@
-# GitHub Action to open issue on new CFITSIO release
+# GitHub Action to cancel duplicate workflows
 
-Open a GitHub issue if CFITSIO has a new release in the past
-`CFITSIO_CHECK_N_DAYS` (default is 7 days). This Action should run
-on schedule only every `CFITSIO_CHECK_N_DAYS` days or it is going
-to open duplicate issues.
-
-Create a `.github/workflows/check_cfitsio_release.yml` with this:
+In the event of quick successive pushes to a branch or a pull request,
+this action attempts to cancel all duplicate workflows. You should run
+this at the beginning of your workflow. In your CI workflow YAML, add this:
 
 ```
-name: Check CFITSIO release
-
-on:
-  schedule:
-    # Weekly Monday 6 AM build.
-    # * is a special character in YAML so you have to quote this string.
-    - cron: '0 6 * * 1'
-
 jobs:
-  check_cfitsio:
-    name: Open issue if new release found
+  cancel_previous:
+    name: Cancel previous duplicate workflows
     runs-on: ubuntu-latest
     steps:
-    - name: Check release
-      uses: pllim/actions-check_cfitsio_release@main
+    - name: Cancel
+      uses: pllim/actions-cancel-workflows@main
       env:
-        CFITSIO_CHECK_N_DAYS: 7
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # Probably wants to wait till older workflows cancelled first.
+  # Placeholder for actual CI jobs.
+  actual_ci:
+    needs: cancel_previous
+    ...
 ```

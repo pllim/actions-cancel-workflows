@@ -3,4 +3,4 @@
 PYTHON=$(which python3.8)
 echo "PYTHON=${PYTHON}"
 
-$PYTHON /check_cfitsio_release.py
+$PYTHON /cancel_workflows.py
