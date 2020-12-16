@@ -36,7 +36,7 @@ for wlist in (workflows_queued, workflows_running):
             latest_timestamp = wf.created_at
         elif wf.created_at > latest_timestamp:
             latest_timestamp = wf.created_at
-        print('Found {wf} created at {wf.created_at}, '
+        print(f'Found {wf} created at {wf.created_at}, '
               f'latest timestamp now {latest_timestamp}')
 
 if latest_timestamp is None:
