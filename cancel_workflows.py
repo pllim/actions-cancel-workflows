@@ -18,8 +18,10 @@ workflows_running = repo.get_workflow_runs(branch=branch_name,
                                            status='in_progress')
 workflows_queued = repo.get_workflow_runs(branch=branch_name, status='queued')
 
-latest_timestamp = None
-workflows_list = []
+run_id = os.environ['GITHUB_RUN_ID']
+this_wf = repo.get_workflow_run(run_id)
+
+print(f'This workflow is {this_wf}')
 
 for wlist in (workflows_queued, workflows_running):
     for wf in wlist:
@@ -29,27 +31,13 @@ for wlist in (workflows_queued, workflows_running):
         else:
             wname = repo.get_workflow(str(wid)).name
             workflow_lookup_cache[wid] = wname
-        if wname != workflow_name:
+        if wname != workflow_name:  # Ignore other workflow names
             continue
-        workflows_list.append(wf)
-        if latest_timestamp is None:
-            latest_timestamp = wf.created_at
-        elif wf.created_at > latest_timestamp:
-            latest_timestamp = wf.created_at
-        print(f'Found {wf} created at {wf.created_at}, '
-              f'latest timestamp now {latest_timestamp}')
+        if wf.created_at < this_wf.created_at:  # Cancel older workflows
+            wf.cancel()
+            print(f'Cancelling {wf.status} {wf} created at {wf.created_at}, '
+                  f'older than {this_wf.created_at}')
 
-if latest_timestamp is None:
-    print(f'No duplicate workflows for {workflow_name} workflow for '
-          f'{branch_name} branch in {repo_name}\n\n'
-          f'lookup: {workflow_lookup_cache}')
-    sys.exit(0)
-
-for wf in workflows_list:
-    if wf.created_at < latest_timestamp:
-        print(f'Cancelling {wf.status} {wf}')
-        wf.cancel()
-
-print(f'Done checking for duplicate workflows for {workflow_name} for '
+print(f'Done checking for older duplicate workflows for {workflow_name} for '
       f'{branch_name} branch in {repo_name}\n\n'
       f'lookup: {workflow_lookup_cache}')

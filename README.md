@@ -1,7 +1,7 @@
 # GitHub Action to cancel duplicate workflows
 
 In the event of quick successive pushes to a branch or a pull request,
-this action attempts to cancel all duplicate workflows but the latest one.
+this action attempts to cancel all older duplicate workflows.
 You should run this at the beginning of your workflow.
 In your CI workflow YAML, add this:
 
