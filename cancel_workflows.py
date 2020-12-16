@@ -3,7 +3,8 @@ import sys
 
 from github import Github
 
-workflow_id = os.environ['GITHUB_ACTION']
+workflow_lookup_cache = {}
+workflow_name = os.environ['GITHUB_WORKFLOW']
 event_name = os.environ['GITHUB_EVENT_NAME']
 if event_name in ('pull_request_target', 'pull_request'):
     branch_name = os.environ['GITHUB_HEAD_REF']
@@ -22,7 +23,13 @@ workflows_list = [workflows_queued, workflows_running]
 
 for wlist in workflows_list:
     for wf in wlist:
-        if wf.workflow_id != workflow_id:
+        wid = wf.workflow_id
+        if wid in workflow_lookup_cache:
+            wname = workflow_lookup_cache[wid]
+        else:
+            wname = repo.get_workflow(str(wid)).name
+            workflow_lookup_cache[wid] = wname
+        if wname != workflow_name:
             continue
         if latest_timestamp is None:
             latest_timestamp = wf.created_at
@@ -30,8 +37,9 @@ for wlist in workflows_list:
             latest_timestamp = wf.created_at
 
 if latest_timestamp is None:
-    print(f'No duplicate workflows for ID {workflow_id} for {branch_name} in '
-          f'{repo_name}')
+    print(f'No duplicate workflows for {workflow_name} workflow for '
+          f'{branch_name} branch in {repo_name}\n\n'
+          f'lookup: {workflow_lookup_cache}')
     sys.exit(0)
 
 for wlist in workflows_list:
@@ -40,5 +48,5 @@ for wlist in workflows_list:
             print(f'Cancelling {wf.status} {wf}')
             wf.cancel()
 
-print(f'Done checking for duplicate workflows for ID {workflow_id} for '
-      f'{branch_name} in {repo_name}')
+print(f'Done checking for duplicate workflows for {workflow_name} for '
+      f'{branch_name} branch in {repo_name}')
