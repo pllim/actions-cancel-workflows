@@ -20,8 +20,8 @@ workflows_queued = repo.get_workflow_runs(branch=branch_name, status='queued')
 
 run_id = os.environ['GITHUB_RUN_ID']
 print(f'Run ID: {run_id}')
-this_wf = repo.get_workflow_run(run_id)
 
+this_wf = repo.get_workflow_run(int(run_id))
 print(f'This workflow is {this_wf}')
 
 for wlist in (workflows_queued, workflows_running):
