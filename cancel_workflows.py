@@ -3,7 +3,7 @@ import sys
 
 from github import Github
 
-workflow_id = os.environ['GITHUB_RUN_ID']
+workflow_id = os.environ['GITHUB_ACTION']
 event_name = os.environ['GITHUB_EVENT_NAME']
 if event_name in ('pull_request_target', 'pull_request'):
     branch_name = os.environ['GITHUB_HEAD_REF']
