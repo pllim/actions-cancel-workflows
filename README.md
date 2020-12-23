@@ -1,3 +1,12 @@
+# Status: Archived
+
+Use other workflows out there that are implemented in TypeScript or JavaScript,
+as that is much faster due to lack of Docker spin-up overhead. One example
+workflow out there is https://github.com/styfle/cancel-workflow-action .
+
+If you must use this, it should still work but there are no plans to
+further develop this Action.
+
 # GitHub Action to cancel duplicate workflows
 
 In the event of quick successive pushes to a branch or a pull request,
